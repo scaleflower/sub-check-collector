@@ -1,0 +1,34 @@
+# 依赖
+node_modules/
+
+# 编译输出
+dist/
+build/
+
+# 环境变量
+.env
+
+# 输出文件
+output/
+
+# 配置文件备份
+config.yaml.backup.*
+config.yaml.original
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TypeScript
+*.tsbuildinfo
