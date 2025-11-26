@@ -9,6 +9,9 @@ import { SubscriptionLink } from './types';
 export class ConfigUpdater {
   private configPath: string;
 
+  // 默认 URL，始终放在第一行，永不覆盖
+  private readonly DEFAULT_URL = 'https://misub.907737.xyz/allnodes';
+
   constructor(configPath: string = './config.yaml') {
     this.configPath = configPath;
   }
@@ -83,13 +86,23 @@ export class ConfigUpdater {
 
   /**
    * 合并新旧链接
+   * 默认 URL 会被排除在合并逻辑外，由 writeConfigWithComments 单独处理
    */
   private mergeUrls(existingUrls: Set<string>, newUrls: Set<string>): Set<string> {
-    const merged = new Set<string>(existingUrls);
+    const merged = new Set<string>();
 
-    // 添加新链接
+    // 添加现有链接（排除默认 URL，它会单独处理）
+    for (const url of existingUrls) {
+      if (url !== this.DEFAULT_URL) {
+        merged.add(url);
+      }
+    }
+
+    // 添加新链接（排除默认 URL）
     for (const url of newUrls) {
-      merged.add(url);
+      if (url !== this.DEFAULT_URL) {
+        merged.add(url);
+      }
     }
 
     return merged;
@@ -104,9 +117,13 @@ export class ConfigUpdater {
     newUrls: Set<string>
   ): Promise<void> {
     // 构建新的 sub-urls 部分
-    const urlsLines = Array.from(newUrls)
-      .sort() // 排序
-      .map((url) => `  - "${url}"`)
+    // 1. 默认 URL 始终放在第一行
+    // 2. 其他 URL 排序后追加
+    // 3. URL 不带引号（JSON 格式）
+    const sortedUrls = Array.from(newUrls).sort();
+    const allUrls = [this.DEFAULT_URL, ...sortedUrls];
+    const urlsLines = allUrls
+      .map((url) => `  - ${url}`)
       .join('\n');
 
     // 改进的正则表达式:
@@ -118,7 +135,6 @@ export class ConfigUpdater {
     const lines = originalContent.split('\n');
     const newLines: string[] = [];
     let inSubUrls = false;
-    let subUrlsStartIndex = -1;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -126,7 +142,6 @@ export class ConfigUpdater {
       // 检测 sub-urls: 这一行
       if (line.trim() === 'sub-urls:') {
         inSubUrls = true;
-        subUrlsStartIndex = newLines.length;
         newLines.push(line);
         continue;
       }
