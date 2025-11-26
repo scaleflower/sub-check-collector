@@ -119,10 +119,11 @@ export class ConfigUpdater {
     // 构建新的 sub-urls 部分
     // 1. 默认 URL 始终放在第一行
     // 2. 其他 URL 排序后追加
-    // 3. URL 不带引号（JSON 格式）
+    // 3. URL 不带引号
+    // 4. sub-urls: 后需要一个空行，然后是 URL 列表
     const sortedUrls = Array.from(newUrls).sort();
     const allUrls = [this.DEFAULT_URL, ...sortedUrls];
-    const urlsLines = allUrls
+    const urlsLines = '\n' + allUrls
       .map((url) => `  - ${url}`)
       .join('\n');
 
