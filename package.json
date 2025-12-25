@@ -8,15 +8,7 @@
     "start": "npm run build && node dist/index.js",
     "dev": "ts-node src/index.ts",
     "once": "npm run dev once",
-    "package": "pkg dist/index.js --targets node18-win-x64,node18-macos-x64,node18-linux-x64 --out-path dist/bin",
-    "package:all": "npm run build && npm run package",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "pkg": {
-    "assets": [
-      "config.yaml.example",
-      ".env.example"
-    ]
   },
   "keywords": [
     "v2ray",
