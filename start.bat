@@ -1,13 +1,13 @@
 @echo off
-REM V2Ray/Clash è®¢é˜…é“¾æŽ¥æ”¶é›†å™¨ - Windows å¯åŠ¨è„šæœ¬
+REM V2Ray/Clash ¶©ÔÄÁ´½ÓÊÕ¼¯Æ÷ - Windows Æô¶¯½Å±¾
 chcp 65001 >nul
 
-echo â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-echo    V2Ray/Clash è®¢é˜…é“¾æŽ¥è‡ªåŠ¨æ”¶é›†å™¨
-echo â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+echo ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T
+echo    V2Ray/Clash ¶©ÔÄÁ´½Ó×Ô¶¯ÊÕ¼¯Æ÷
+echo ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T
 echo.
 
-REM è§£æžå‚æ•°
+REM ½âÎö²ÎÊý
 set MODE=%1
 if "%MODE%"=="" set MODE=schedule
 
@@ -15,70 +15,70 @@ if "%MODE%"=="help" goto :show_help
 if "%MODE%"=="--help" goto :show_help
 if "%MODE%"=="-h" goto :show_help
 
-echo [ä¿¡æ¯] æ¨¡å¼: %MODE%
+echo [ÐÅÏ¢] Ä£Ê½: %MODE%
 echo.
 
-REM æ£€æŸ¥ Node.js
+REM ¼ì²é Node.js
 where node >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo [é”™è¯¯] æœªæ‰¾åˆ° Node.js,è¯·å…ˆå®‰è£… Node.js
+    echo [´íÎó] Î´ÕÒµ½ Node.js,ÇëÏÈ°²×° Node.js
     exit /b 1
 )
-echo [ä¿¡æ¯] Node.js ç‰ˆæœ¬:
+echo [ÐÅÏ¢] Node.js °æ±¾:
 node --version
 
-REM æ£€æŸ¥ä¾èµ–
+REM ¼ì²éÒÀÀµ
 if not exist "node_modules" (
-    echo [è­¦å‘Š] æœªæ‰¾åˆ°ä¾èµ–,æ­£åœ¨å®‰è£…...
+    echo [¾¯¸æ] Î´ÕÒµ½ÒÀÀµ,ÕýÔÚ°²×°...
     call npm install
     if %ERRORLEVEL% NEQ 0 (
-        echo [é”™è¯¯] ä¾èµ–å®‰è£…å¤±è´¥
+        echo [´íÎó] ÒÀÀµ°²×°Ê§°Ü
         exit /b 1
     )
-    echo [æˆåŠŸ] ä¾èµ–å®‰è£…å®Œæˆ
+    echo [³É¹¦] ÒÀÀµ°²×°Íê³É
 ) else (
-    echo [ä¿¡æ¯] ä¾èµ–å·²å®‰è£…
+    echo [ÐÅÏ¢] ÒÀÀµÒÑ°²×°
 )
 
-REM æ£€æŸ¥ .env æ–‡ä»¶
+REM ¼ì²é .env ÎÄ¼þ
 if not exist ".env" (
-    echo [è­¦å‘Š] æœªæ‰¾åˆ° .env æ–‡ä»¶
+    echo [¾¯¸æ] Î´ÕÒµ½ .env ÎÄ¼þ
     if exist ".env.example" (
-        echo [ä¿¡æ¯] æ­£åœ¨ä»Ž .env.example åˆ›å»º .env æ–‡ä»¶...
+        echo [ÐÅÏ¢] ÕýÔÚ´Ó .env.example ´´½¨ .env ÎÄ¼þ...
         copy .env.example .env >nul
-        echo [æˆåŠŸ] .env æ–‡ä»¶å·²åˆ›å»º,è¯·ç¼–è¾‘é…ç½®åŽé‡æ–°è¿è¡Œ
+        echo [³É¹¦] .env ÎÄ¼þÒÑ´´½¨,Çë±à¼­ÅäÖÃºóÖØÐÂÔËÐÐ
         echo.
-        echo [è­¦å‘Š] è¯·ç¼–è¾‘ .env æ–‡ä»¶é…ç½®å‚æ•°,ç‰¹åˆ«æ˜¯ GITHUB_TOKEN
+        echo [¾¯¸æ] Çë±à¼­ .env ÎÄ¼þÅäÖÃ²ÎÊý,ÌØ±ðÊÇ GITHUB_TOKEN
         pause
         exit /b 0
     ) else (
-        echo [é”™è¯¯] æœªæ‰¾åˆ° .env.example æ–‡ä»¶
+        echo [´íÎó] Î´ÕÒµ½ .env.example ÎÄ¼þ
         exit /b 1
     )
 ) else (
-    echo [ä¿¡æ¯] é…ç½®æ–‡ä»¶: .env
+    echo [ÐÅÏ¢] ÅäÖÃÎÄ¼þ: .env
 )
 echo.
 
-REM æž„å»ºé¡¹ç›®
-echo [ä¿¡æ¯] æ­£åœ¨æž„å»ºé¡¹ç›®...
+REM ¹¹½¨ÏîÄ¿
+echo [ÐÅÏ¢] ÕýÔÚ¹¹½¨ÏîÄ¿...
 call npm run build
 if %ERRORLEVEL% NEQ 0 (
-    echo [é”™è¯¯] æž„å»ºå¤±è´¥
+    echo [´íÎó] ¹¹½¨Ê§°Ü
     exit /b 1
 )
-echo [æˆåŠŸ] æž„å»ºå®Œæˆ
+echo [³É¹¦] ¹¹½¨Íê³É
 echo.
 
-REM åˆ›å»ºå¿…è¦çš„ç›®å½•
+REM ´´½¨±ØÒªµÄÄ¿Â¼
 if not exist "output" mkdir output
 if not exist "logs" mkdir logs
-echo [ä¿¡æ¯] è¾“å‡ºç›®å½•: ./output
-echo [ä¿¡æ¯] æ—¥å¿—ç›®å½•: ./logs
+echo [ÐÅÏ¢] Êä³öÄ¿Â¼: ./output
+echo [ÐÅÏ¢] ÈÕÖ¾Ä¿Â¼: ./logs
 echo.
 
-REM å¯åŠ¨åº”ç”¨
-echo [æˆåŠŸ] æ­£åœ¨å¯åŠ¨åº”ç”¨...
+REM Æô¶¯Ó¦ÓÃ
+echo [³É¹¦] ÕýÔÚÆô¶¯Ó¦ÓÃ...
 echo.
 
 if "%MODE%"=="once" goto :run_once
@@ -86,7 +86,7 @@ if "%MODE%"=="run" goto :run_once
 if "%MODE%"=="schedule" goto :run_schedule
 if "%MODE%"=="now" goto :run_now
 
-echo [é”™è¯¯] æœªçŸ¥å‚æ•°: %MODE%
+echo [´íÎó] Î´Öª²ÎÊý: %MODE%
 goto :show_help
 
 :run_once
@@ -102,12 +102,12 @@ call npm start -- --run-now
 goto :end
 
 :show_help
-echo ä½¿ç”¨æ–¹æ³•:
-echo   start.bat              - å¯åŠ¨å®šæ—¶ä»»åŠ¡
-echo   start.bat once         - ç«‹å³æ‰§è¡Œä¸€æ¬¡
-echo   start.bat schedule     - å¯åŠ¨å®šæ—¶ä»»åŠ¡
-echo   start.bat now          - å¯åŠ¨å®šæ—¶ä»»åŠ¡å¹¶ç«‹å³æ‰§è¡Œä¸€æ¬¡
-echo   start.bat help         - æ˜¾ç¤ºå¸®åŠ©ä¿¡æ¯
+echo Ê¹ÓÃ·½·¨:
+echo   start.bat              - Æô¶¯¶¨Ê±ÈÎÎñ
+echo   start.bat once         - Á¢¼´Ö´ÐÐÒ»´Î
+echo   start.bat schedule     - Æô¶¯¶¨Ê±ÈÎÎñ
+echo   start.bat now          - Æô¶¯¶¨Ê±ÈÎÎñ²¢Á¢¼´Ö´ÐÐÒ»´Î
+echo   start.bat help         - ÏÔÊ¾°ïÖúÐÅÏ¢
 echo.
 exit /b 0
 
