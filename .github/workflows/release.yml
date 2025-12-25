@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
       - name: Checkout code
@@ -25,16 +26,32 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
+      - name: Install pkg globally
+        run: npm install -g pkg pkg-fetch
+
+      - name: Pre-fetch pkg binaries
+        env:
+          PKG_CACHE_PATH: ~/.pkg-cache
+        run: |
+          mkdir -p ~/.pkg-cache/v3.5
+          # Pre-fetch binaries with retry mechanism
+          for target in node18-linux-x64 node18-macos-x64 node18-win-x64; do
+            echo "Fetching $target..."
+            for i in 1 2 3 4 5; do
+              npx pkg-fetch $target && break || echo "Attempt $i failed, retrying..."
+              sleep 10
+            done
+          done
+
       - name: Package for all platforms
         env:
-          PKG_CACHE_PATH: /tmp/pkg-cache
+          PKG_CACHE_PATH: ~/.pkg-cache
         run: |
           mkdir -p dist/bin
-          mkdir -p $PKG_CACHE_PATH
-          npx pkg dist/index.js \
+          pkg dist/index.js \
             --targets node18-win-x64,node18-macos-x64,node18-linux-x64 \
             --out-path dist/bin \
-            --debug
+            --compress GZip
 
       - name: List built files
         run: ls -la dist/bin/
@@ -86,4 +103,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
