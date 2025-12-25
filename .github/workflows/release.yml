@@ -22,16 +22,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install pkg
-        run: npm install -g pkg
-
       - name: Build TypeScript
         run: npm run build
 
       - name: Package for all platforms
+        env:
+          PKG_CACHE_PATH: /tmp/pkg-cache
         run: |
           mkdir -p dist/bin
-          pkg dist/index.js --targets node18-win-x64,node18-macos-x64,node18-linux-x64 --out-path dist/bin
+          mkdir -p $PKG_CACHE_PATH
+          npx pkg dist/index.js \
+            --targets node18-win-x64,node18-macos-x64,node18-linux-x64 \
+            --out-path dist/bin \
+            --debug
+
+      - name: List built files
+        run: ls -la dist/bin/
 
       - name: Prepare release packages
         run: |
@@ -80,3 +86,4 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
