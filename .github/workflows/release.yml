@@ -94,12 +94,13 @@ jobs:
           tar -czvf sub-check-collector-${VERSION}-macos.tar.gz sub-check-collector-${VERSION}-macos/
           tar -czvf sub-check-collector-${VERSION}-linux.tar.gz sub-check-collector-${VERSION}-linux/
 
+      - name: List release files
+        run: ls -la release/
+
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: ncipollo/release-action@v1
         with:
-          files: |
-            release/*.zip
-            release/*.tar.gz
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "release/*.zip,release/*.tar.gz"
+          generateReleaseNotes: true
+          allowUpdates: true
+          replacesArtifacts: true
