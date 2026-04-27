@@ -40,15 +40,37 @@ export class GitHubSearcher {
         console.log(`   最大更新天数: ${maxDaysSinceUpdate} 天`);
       }
 
-      // 先按更新时间搜索,获取更多结果用于后续排序
-      const response = await this.octokit.rest.search.repos({
-        q: query,
-        sort: 'updated',
-        order: 'desc',
-        per_page: Math.min(maxResults * 3, 100), // 获取3倍数量用于过滤和排序
-      });
+      // 分页获取结果，GitHub API 单页最多 100 条
+      const perPage = 100;
+      const maxPages = Math.ceil((maxResults * 3) / perPage);
+      let allItems: any[] = [];
 
-      let repositories: Repository[] = response.data.items.map((item) => ({
+      for (let page = 1; page <= maxPages; page++) {
+        console.log(`   📄 获取第 ${page}/${maxPages} 页...`);
+        const response = await this.octokit.rest.search.repos({
+          q: query,
+          sort: 'updated',
+          order: 'desc',
+          per_page: perPage,
+          page,
+        });
+
+        const items = response.data.items;
+        allItems = allItems.concat(items);
+
+        console.log(`   ✅ 第 ${page} 页获取 ${items.length} 条，累计 ${allItems.length} 条`);
+
+        // 如果本页结果不足 perPage，说明没有更多数据了
+        if (items.length < perPage) break;
+
+        // GitHub Search API 最多返回 1000 条结果
+        if (allItems.length >= 1000) break;
+
+        // 避免触发 GitHub API 速率限制
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+
+      let repositories: Repository[] = allItems.map((item) => ({
         fullName: item.full_name,
         url: item.html_url,
         description: item.description || undefined,

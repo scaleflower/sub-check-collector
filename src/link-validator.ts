@@ -111,6 +111,11 @@ export class LinkValidator {
         }
       });
 
+      // 批次间延迟，避免触发 GitHub Pages 限流
+      if (i + this.concurrency < links.length) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+
       // 显示批次进度
       const percentage = ((completed / links.length) * 100).toFixed(1);
       console.log(`   进度: ${completed}/${links.length} (${percentage}%)\n`);
