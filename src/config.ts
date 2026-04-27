@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import { Config } from './types';
 
 // 加载环境变量
-dotenv.config();
+dotenv.config({ override: true });
 
 /**
  * 默认配置

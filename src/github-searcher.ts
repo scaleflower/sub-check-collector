@@ -40,31 +40,39 @@ export class GitHubSearcher {
         console.log(`   最大更新天数: ${maxDaysSinceUpdate} 天`);
       }
 
-      // 分页获取结果，GitHub API 单页最多 100 条
+      // 使用日期游标分页，GitHub Search API 的 page 参数不可靠
       const perPage = 100;
-      const maxPages = Math.ceil((maxResults * 3) / perPage);
+      const targetCount = Math.min(maxResults * 3, 1000);
       let allItems: any[] = [];
+      let dateCursor = '';
 
-      for (let page = 1; page <= maxPages; page++) {
-        console.log(`   📄 获取第 ${page}/${maxPages} 页...`);
+      for (let round = 1; allItems.length < targetCount; round++) {
+        // 每轮查询加上 pushed 限定条件，缩小日期范围获取新结果
+        const q = dateCursor
+          ? `${query} pushed:<${dateCursor}`
+          : query;
+
+        console.log(`   📄 获取第 ${round} 轮 (累计 ${allItems.length} 条)...`);
         const response = await this.octokit.rest.search.repos({
-          q: query,
+          q,
           sort: 'updated',
           order: 'desc',
           per_page: perPage,
-          page,
         });
 
         const items = response.data.items;
+        if (items.length === 0) break;
+
         allItems = allItems.concat(items);
+        console.log(`   ✅ 第 ${round} 轮获取 ${items.length} 条，累计 ${allItems.length} 条 (total_count: ${response.data.total_count})`);
 
-        console.log(`   ✅ 第 ${page} 页获取 ${items.length} 条，累计 ${allItems.length} 条`);
+        // 用本页最旧结果的更新时间作为下一轮游标
+        const lastItem = items[items.length - 1];
+        const lastDate = new Date(lastItem.updated_at);
+        dateCursor = lastDate.toISOString().split('T')[0]; // YYYY-MM-DD
 
-        // 如果本页结果不足 perPage，说明没有更多数据了
+        // 本轮结果不足 perPage，说明已经没有更多数据
         if (items.length < perPage) break;
-
-        // GitHub Search API 最多返回 1000 条结果
-        if (allItems.length >= 1000) break;
 
         // 避免触发 GitHub API 速率限制
         await new Promise((resolve) => setTimeout(resolve, 2000));
