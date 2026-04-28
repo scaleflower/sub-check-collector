@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/beck-8/subs-check/check"
+	"github.com/beck-8/subs-check/collector"
 	"github.com/beck-8/subs-check/config"
 	"github.com/beck-8/subs-check/save/method"
 	"github.com/gin-contrib/pprof"
@@ -84,6 +85,10 @@ func (app *App) initHttpServer() error {
 
 			// 日志相关API
 			api.GET("/logs", app.getLogs)
+
+			// Collector 配置 API
+			api.GET("/collector-config", app.getCollectorConfig)
+			api.POST("/collector-config", app.updateCollectorConfig)
 		}
 
 		// 配置页面
@@ -293,4 +298,35 @@ func ReadLastNLines(filePath string, n int) ([]string, error) {
 
 func GenerateSimpleKey() string {
 	return fmt.Sprintf("%06d", time.Now().UnixNano()%1000000)
+}
+
+// getCollectorConfig 读取 collector.env 配置
+func (app *App) getCollectorConfig(c *gin.Context) {
+	data, err := collector.ReadEnvFile()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("读取 collector 配置失败: %v", err)})
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}
+
+// updateCollectorConfig 更新 collector.env 配置
+func (app *App) updateCollectorConfig(c *gin.Context) {
+	var data map[string]string
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求格式"})
+		return
+	}
+
+	if err := collector.WriteEnvFile(data); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("保存 collector 配置失败: %v", err)})
+		return
+	}
+
+	// 立即加载新配置到内存
+	if err := collector.LoadEnv(); err != nil {
+		slog.Error(fmt.Sprintf("加载 collector.env 失败: %v", err))
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Collector 配置已更新"})
 }

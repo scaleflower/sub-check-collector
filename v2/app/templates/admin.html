@@ -518,8 +518,19 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-gear me-1"></i>配置编辑器</span>
-                            <div>
+                            <ul class="nav nav-tabs card-header-tabs" style="border-bottom: none; font-size: 0.9rem;">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-tab="yaml" href="#" style="padding: 0.3rem 0.8rem;">
+                                        <i class="bi bi-file-earmark-code me-1"></i>YAML 配置
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-tab="collector" href="#" style="padding: 0.3rem 0.8rem;">
+                                        <i class="bi bi-search me-1"></i>Collector 配置
+                                    </a>
+                                </li>
+                            </ul>
+                            <div id="yamlTabButtons">
                                 <button id="toggleConfig" class="btn btn-outline-secondary btn-sm me-2" title="显示/隐藏配置">
                                     <i class="bi bi-eye-slash"></i>
                                 </button>
@@ -530,16 +541,64 @@
                                     <i class="bi bi-arrow-repeat me-1"></i>重载
                                 </button>
                             </div>
+                            <div id="collectorTabButtons" style="display: none;">
+                                <button id="saveCollectorConfig" class="btn btn-success btn-sm">
+                                    <i class="bi bi-save me-1"></i>保存
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="editor-wrapper">
+                        <!-- YAML 编辑器面板 -->
+                        <div id="yamlPanel" class="editor-wrapper">
                             <div id="editor"></div>
                             <div id="editorOverlay" class="editor-overlay">
                                 <div class="editor-overlay-message">
                                     <i class="bi bi-eye-slash me-2"></i>配置已隐藏，点击查看
                                 </div>
                             </div>
+                        </div>
+                        <!-- Collector 配置面板 -->
+                        <div id="collectorPanel" style="display: none; padding: 20px; overflow-y: auto;">
+                            <div class="mb-4">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="collectorEnabled" style="width: 3em; height: 1.5em;">
+                                    <label class="form-check-label fw-bold" for="collectorEnabled" style="font-size: 1.1em;">启用 Collector 自动收集</label>
+                                </div>
+                                <div class="text-muted mb-3" style="font-size: 0.85em;">
+                                    启用后，每次代理检测前会自动从 GitHub 搜索订阅链接并追加到检测列表。
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="collectorKeywords" class="form-label fw-bold">
+                                        <i class="bi bi-tags me-1"></i>搜索关键词
+                                    </label>
+                                    <input type="text" class="form-control" id="collectorKeywords" placeholder="clash,subscription">
+                                    <div class="form-text">逗号分隔，用于 GitHub Search API 搜索仓库</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="collectorMaxRepos" class="form-label fw-bold">
+                                        <i class="bi bi-collection me-1"></i>最大仓库数
+                                    </label>
+                                    <input type="number" class="form-control" id="collectorMaxRepos" min="1" max="100" value="30">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="collectorMinStars" class="form-label fw-bold">
+                                        <i class="bi bi-star me-1"></i>最低 Star
+                                    </label>
+                                    <input type="number" class="form-control" id="collectorMinStars" min="0" value="0">
+                                    <div class="form-text">0 表示不限制</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="collectorMaxDays" class="form-label fw-bold">
+                                        <i class="bi bi-calendar me-1"></i>最大更新天数
+                                    </label>
+                                    <input type="number" class="form-control" id="collectorMaxDays" min="0" value="90">
+                                    <div class="form-text">0 表示不限制</div>
+                                </div>
+                            </div>
+                            <div id="collectorAlert" class="alert mt-3" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
@@ -1084,6 +1143,99 @@
         }
 
         getVersionInfo();
+
+        // ====== Collector Tab 切换与配置管理 ======
+        const collectorDom = {
+            panel: document.getElementById('collectorPanel'),
+            yamlPanel: document.getElementById('yamlPanel'),
+            yamlBtns: document.getElementById('yamlTabButtons'),
+            collectorBtns: document.getElementById('collectorTabButtons'),
+            enabled: document.getElementById('collectorEnabled'),
+            keywords: document.getElementById('collectorKeywords'),
+            maxRepos: document.getElementById('collectorMaxRepos'),
+            minStars: document.getElementById('collectorMinStars'),
+            maxDays: document.getElementById('collectorMaxDays'),
+            alert: document.getElementById('collectorAlert'),
+            saveBtn: document.getElementById('saveCollectorConfig'),
+        };
+
+        // Tab 切换
+        document.querySelectorAll('[data-tab]').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const target = this.getAttribute('data-tab');
+                if (target === 'yaml') {
+                    collectorDom.panel.style.display = 'none';
+                    collectorDom.yamlPanel.style.display = '';
+                    collectorDom.yamlBtns.style.display = '';
+                    collectorDom.collectorBtns.style.display = 'none';
+                } else {
+                    collectorDom.panel.style.display = '';
+                    collectorDom.yamlPanel.style.display = 'none';
+                    collectorDom.yamlBtns.style.display = 'none';
+                    collectorDom.collectorBtns.style.display = '';
+                    loadCollectorConfig();
+                }
+            });
+        });
+
+        function showCollectorAlert(msg, type) {
+            collectorDom.alert.textContent = msg;
+            collectorDom.alert.className = 'alert mt-3 alert-' + type;
+            collectorDom.alert.style.display = '';
+            setTimeout(() => { collectorDom.alert.style.display = 'none'; }, 3000);
+        }
+
+        function loadCollectorConfig() {
+            fetch('/api/collector-config', {
+                headers: addApiKeyHeader()
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('请求失败');
+                return response.json();
+            })
+            .then(data => {
+                collectorDom.enabled.checked = (data['COLLECTOR_ENABLED'] === 'true');
+                collectorDom.keywords.value = data['COLLECTOR_KEYWORDS'] || '';
+                collectorDom.maxRepos.value = data['COLLECTOR_MAX_REPOS'] || '30';
+                collectorDom.minStars.value = data['COLLECTOR_MIN_STARS'] || '0';
+                collectorDom.maxDays.value = data['COLLECTOR_MAX_DAYS'] || '90';
+            })
+            .catch(error => {
+                console.error('加载 collector 配置失败:', error);
+                showCollectorAlert('加载配置失败: ' + error.message, 'danger');
+            });
+        }
+
+        collectorDom.saveBtn.addEventListener('click', function() {
+            const data = {
+                'COLLECTOR_ENABLED': collectorDom.enabled.checked ? 'true' : 'false',
+                'COLLECTOR_KEYWORDS': collectorDom.keywords.value,
+                'COLLECTOR_MAX_REPOS': collectorDom.maxRepos.value,
+                'COLLECTOR_MIN_STARS': collectorDom.minStars.value,
+                'COLLECTOR_MAX_DAYS': collectorDom.maxDays.value,
+            };
+
+            fetch('/api/collector-config', {
+                method: 'POST',
+                headers: { ...addApiKeyHeader(), 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('保存失败');
+                return response.json();
+            })
+            .then(() => {
+                showCollectorAlert('配置已保存并自动加载', 'success');
+            })
+            .catch(error => {
+                console.error('保存 collector 配置失败:', error);
+                showCollectorAlert('保存失败: ' + error.message, 'danger');
+            });
+        });
     </script>
 
 </body>
