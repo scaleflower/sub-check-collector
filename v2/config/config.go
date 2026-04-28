@@ -68,6 +68,13 @@ type Config struct {
 	Filter               []string `yaml:"filter"`
 	KeepDays             int      `yaml:"keep-days"`
 	DNS                  DNSConfig `yaml:"dns"`
+
+	// Collector 配置
+	CollectorEnabled  bool     `yaml:"collector-enabled"`
+	CollectorKeywords []string `yaml:"collector-keywords"`
+	CollectorMaxRepos int      `yaml:"collector-max-repos"`
+	CollectorMinStars int      `yaml:"collector-min-stars"`
+	CollectorMaxDays  int      `yaml:"collector-max-days"`
 }
 
 // DNSConfig controls mihomo's global resolver used by every proxy probe.
@@ -92,6 +99,8 @@ var GlobalConfig = &Config{
 	SubUrlsGetUA:       "clash.meta (https://github.com/beck-8/subs-check)",
 	SubUrlsReTry:       3,
 	SubUrlsConcurrent:  20,
+	CollectorMaxRepos:  30,
+	CollectorMaxDays:   90,
 }
 
 //go:embed config.example.yaml

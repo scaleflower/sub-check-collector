@@ -281,3 +281,19 @@ sub-urls:
   - https://raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/ndnode.txt
   - https://raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/clashmeta.txt
   - https://raw.githubusercontent.com/xiaoji235/airport-free/main/v2ray.txt
+
+# ============ Collector 配置 ============
+# 自动从 GitHub 搜索并收集订阅链接，追加到 sub-urls 中
+# 启用后每次检测前会先运行收集流程
+# 需要 github-token 配置（复用上方已有的 github-token 字段）
+collector-enabled: false
+# 搜索关键字（空格分隔，GitHub Search API 语法）
+collector-keywords:
+  - "clash"
+  - "subscription"
+# 最大搜索仓库数
+collector-max-repos: 30
+# 最低 star 数量 (0=不限)
+collector-min-stars: 0
+# 最大更新天数 (超过此天数未更新的仓库将被忽略, 0=不限)
+collector-max-days: 90

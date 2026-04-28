@@ -12,6 +12,7 @@ import (
 
 	"github.com/beck-8/subs-check/app/monitor"
 	"github.com/beck-8/subs-check/assets"
+	"github.com/beck-8/subs-check/collector"
 	"github.com/beck-8/subs-check/check"
 	"github.com/beck-8/subs-check/config"
 	"github.com/beck-8/subs-check/save"
@@ -237,6 +238,14 @@ func (app *App) checkProxies() error {
 	if config.GlobalConfig.KeepDays > 0 {
 		if hp := save.LoadHistoryProxies(); len(hp) > 0 {
 			config.GlobalProxies = append(config.GlobalProxies, hp...)
+		}
+	}
+
+	// Collector 收集订阅链接
+	if config.GlobalConfig.CollectorEnabled {
+		slog.Info("开始收集订阅链接")
+		if err := collector.Collect(); err != nil {
+			slog.Error(fmt.Sprintf("收集订阅链接失败: %v", err))
 		}
 	}
 
