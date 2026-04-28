@@ -1,0 +1,277 @@
+================================================================================
+[2025-12-25 03:50:34] [INFO] 会话开始: 订阅链接收集
+================================================================================
+[2025-12-25 03:50:34] [INFO] 收集流程启动
+  数据: {
+  "searchKeywords": [
+    "free",
+    "v2ray"
+  ],
+  "maxRepositories": 100,
+  "minStars": 0,
+  "maxDaysSinceUpdate": 90,
+  "validateLinks": true
+}
+[2025-12-25 03:50:34] [INFO] 加载历史数据
+  数据: {
+  "file": "./output/subscriptions.md"
+}
+[2025-12-25 03:50:34] [INFO] 开始搜索 GitHub 仓库
+[2025-12-25 03:50:36] [SUCCESS] 找到 100 个仓库
+  数据: {
+  "count": 100,
+  "repositories": [
+    "chen08209/FlClash",
+    "Pawdroid/Free-servers",
+    "OpenRunner/clash-freenode",
+    "awesome-vpn/awesome-vpn",
+    "OverTheWallNode/SSV2RayTrojanSSRClash",
+    "Epodonios/v2ray-configs",
+    "ripaojiedian/freenode",
+    "Barabama/FreeNodes",
+    "Flikify/Free-Node",
+    "snakem982/proxypool",
+    "barry-far/V2ray-Config",
+    "roosterkid/openproxylist",
+    "sharkDoor/vpn-free-nodes",
+    "PuddinCat/BestClash",
+    "shuaidaoya/FreeNodes",
+    "ebrasha/free-v2ray-public-list",
+    "ts-sf/fly",
+    "shaoyouvip/free",
+    "hello-world-1989/cn-news",
+    "MrMohebi/xray-proxy-grabber-telegram",
+    "MatinGhanbari/v2ray-configs",
+    "telegeam/freenode",
+    "mermeroo/V2RAY-CLASH-BASE64-Subscription.Links",
+    "Epodonios/bulk-xray-v2ray-vless-vmess-...-configs",
+    "kismetpro/NodeSuber",
+    "iboxz/free-v2ray-collector",
+    "penhandev/AutoAiVPN",
+    "igareck/vpn-configs-for-russia",
+    "gfpcom/free-proxy-list",
+    "sakha1370/OpenRay",
+    "V2RayRoot/V2RayConfig",
+    "xiaoji235/airport-free",
+    "kort0881/vpn-vless-configs-russia",
+    "bin1site1/V2rayFree",
+    "9Knight9n/v2ray-aggregator",
+    "crackbest/V2ray-Config",
+    "longlon/v2ray-config",
+    "RaitonRed/ConfigsHub",
+    "Surfboardv2ray/Proxy-sorter",
+    "thirtysixpw/v2ray-reaper",
+    "junjun266/FreeProxyGo",
+    "M-Mashreghi/Free-V2ray-Collector",
+    "twj0/subseek",
+    "F0rc3Run/F0rc3Run",
+    "HakurouKen/free-node",
+    "ccpthisbigdog/freedomchina",
+    "Saka2e/AzadiHub",
+    "Sibusiso6/proxy-list",
+    "ovmvo/SubShare",
+    "DukeMehdi/FreeList-V2ray-Configs",
+    "WLget/V2ray_free",
+    "mfuu/v2ray",
+    "w154594742/free-v2ray-node",
+    "xyfqzy/free-nodes",
+    "hamedcode/port-based-v2ray-configs",
+    "wenxig/free-nodes-sub",
+    "LoneKingCode/free-proxy-db",
+    "skka3134/Free-servers",
+    "lerjtl/Testfree",
+    "crashgfw/free-airport-nodes",
+    "VoroninaYanina/free-nodes",
+    "free-proxy-nodes/free-nodes",
+    "hysteria350/free-jichang",
+    "asgharkapk/Sub-Config-Extractor",
+    "AzadNetCH/Clash",
+    "ggborr/FREEE-VPN",
+    "yafeisun/free_v2ray_daily",
+    "topclashnode/topclashnode.github.io",
+    "top-v2ray/top-v2ray.github.io",
+    "freekaring/freekaring.github.io",
+    "freevpndownload/freevpndownload.github.io",
+    "v2raydog/v2raydog.github.io",
+    "clashjiasuqi/clashjiasuqi.github.io",
+    "free-v2rayx/free-v2rayx.github.io",
+    "clashbar/clashbar.github.io",
+    "topv2raynode/topv2raynode.github.io",
+    "proxyfree/proxyfree.github.io",
+    "v2ray-clash-free/v2ray-clash-free.github.io",
+    "vpn-shop/vpn-shop.github.io",
+    "topfreev2ray/topfreev2ray.github.io",
+    "freevpnssr/freevpnssr.github.io",
+    "karingnode/karingnode.github.io",
+    "Freedom-Guard-Builder/Freedom-Finder",
+    "free-clash-v2ray/free-clash-v2ray.github.io",
+    "freevlessnode/freevlessnode.github.io",
+    "free-ssr-clash/free-ssr-clash.github.io",
+    "free-clashx/free-clashx.github.io",
+    "free-v2ray-clash/free-v2ray-clash.github.io",
+    "freessrclash/freessrclash.github.io",
+    "freeqv2ray/freeqv2ray.github.io",
+    "clash-v2ray-free/clash-v2ray-free.github.io",
+    "tuijianjiedian/tuijianjiedian.github.io",
+    "pcfreevpn/pcfreevpn.github.io",
+    "v2ray-free/v2ray-free.github.io",
+    "pornnewbee/free-vless-VPN",
+    "freevpnapp/freevpnapp.github.io",
+    "freeproxyvpn/freeproxyvpn.github.io",
+    "free-v2raynode/free-v2raynode.github.io",
+    "clash-free-node/clash-free-node.github.io",
+    "freevpntuijian/freevpntuijian.github.io"
+  ]
+}
+[2025-12-25 03:56:37] [ERROR] 收集过程失败
+  数据: {
+  "message": "ENOENT: no such file or directory, copyfile './config.yaml' -> './config.yaml.backup.1766634997770'",
+  "stack": "Error: ENOENT: no such file or directory, copyfile './config.yaml' -> './config.yaml.backup.1766634997770'\n    at async Object.copyFile (node:internal/fs/promises:624:10)\n    at async ConfigUpdater.backupConfig (/Users/heyake/Documents/Jacky/sub-check-collector/src/config-updater.ts:187:5)\n    at async SubscriptionCollector.collect (/Users/heyake/Documents/Jacky/sub-check-collector/src/collector.ts:115:9)\n    at async TaskScheduler.runOnce (/Users/heyake/Documents/Jacky/sub-check-collector/src/scheduler.ts:45:5)\n    at async main (/Users/heyake/Documents/Jacky/sub-check-collector/src/index.ts:36:5)",
+  "errno": -2,
+  "code": "ENOENT",
+  "syscall": "copyfile",
+  "path": "./config.yaml",
+  "dest": "./config.yaml.backup.1766634997770"
+}
+================================================================================
+[2025-12-25 04:26:01] [INFO] 会话开始: 订阅链接收集
+================================================================================
+[2025-12-25 04:26:01] [INFO] 收集流程启动
+  数据: {
+  "searchKeywords": [
+    "free",
+    "v2ray"
+  ],
+  "maxRepositories": 100,
+  "minStars": 0,
+  "maxDaysSinceUpdate": 90,
+  "validateLinks": true
+}
+[2025-12-25 04:26:01] [INFO] 加载历史数据
+  数据: {
+  "file": "./output/subscriptions.md"
+}
+[2025-12-25 04:26:01] [INFO] 开始搜索 GitHub 仓库
+[2025-12-25 04:26:04] [SUCCESS] 找到 100 个仓库
+  数据: {
+  "count": 100,
+  "repositories": [
+    "chen08209/FlClash",
+    "Pawdroid/Free-servers",
+    "OpenRunner/clash-freenode",
+    "awesome-vpn/awesome-vpn",
+    "OverTheWallNode/SSV2RayTrojanSSRClash",
+    "Epodonios/v2ray-configs",
+    "ripaojiedian/freenode",
+    "Flikify/Free-Node",
+    "Barabama/FreeNodes",
+    "snakem982/proxypool",
+    "barry-far/V2ray-Config",
+    "roosterkid/openproxylist",
+    "sharkDoor/vpn-free-nodes",
+    "shuaidaoya/FreeNodes",
+    "PuddinCat/BestClash",
+    "xiaoji235/airport-free",
+    "ebrasha/free-v2ray-public-list",
+    "hello-world-1989/cn-news",
+    "ts-sf/fly",
+    "Epodonios/bulk-xray-v2ray-vless-vmess-...-configs",
+    "MrMohebi/xray-proxy-grabber-telegram",
+    "shaoyouvip/free",
+    "MatinGhanbari/v2ray-configs",
+    "freev2rayclash/freev2rayclash.github.io",
+    "telegeam/freenode",
+    "gfpcom/free-proxy-list",
+    "crashgfw/free-airport-nodes",
+    "mermeroo/V2RAY-CLASH-BASE64-Subscription.Links",
+    "iboxz/free-v2ray-collector",
+    "V2RayRoot/V2RayConfig",
+    "penhandev/AutoAiVPN",
+    "kort0881/vpn-vless-configs-russia",
+    "bin1site1/V2rayFree",
+    "kismetpro/NodeSuber",
+    "crackbest/V2ray-Config",
+    "longlon/v2ray-config",
+    "wenxig/free-nodes-sub",
+    "RaitonRed/ConfigsHub",
+    "thirtysixpw/v2ray-reaper",
+    "ovmvo/SubShare",
+    "VoroninaYanina/free-nodes",
+    "junjun266/FreeProxyGo",
+    "free-proxy-nodes/free-nodes",
+    "Saka2e/AzadiHub",
+    "hysteria350/free-jichang",
+    "Sibusiso6/proxy-list",
+    "Freedom-Guard-Builder/Freedom-Finder",
+    "igareck/vpn-configs-for-russia",
+    "sakha1370/OpenRay",
+    "9Knight9n/v2ray-aggregator",
+    "Surfboardv2ray/Proxy-sorter",
+    "M-Mashreghi/Free-V2ray-Collector",
+    "twj0/subseek",
+    "F0rc3Run/F0rc3Run",
+    "HakurouKen/free-node",
+    "ccpthisbigdog/freedomchina",
+    "DukeMehdi/FreeList-V2ray-Configs",
+    "WLget/V2ray_free",
+    "mfuu/v2ray",
+    "w154594742/free-v2ray-node",
+    "xyfqzy/free-nodes",
+    "hamedcode/port-based-v2ray-configs",
+    "LoneKingCode/free-proxy-db",
+    "skka3134/Free-servers",
+    "lerjtl/Testfree",
+    "asgharkapk/Sub-Config-Extractor",
+    "AzadNetCH/Clash",
+    "ggborr/FREEE-VPN",
+    "yafeisun/free_v2ray_daily",
+    "topclashnode/topclashnode.github.io",
+    "top-v2ray/top-v2ray.github.io",
+    "freekaring/freekaring.github.io",
+    "freevpndownload/freevpndownload.github.io",
+    "v2raydog/v2raydog.github.io",
+    "clashjiasuqi/clashjiasuqi.github.io",
+    "free-v2rayx/free-v2rayx.github.io",
+    "clashbar/clashbar.github.io",
+    "topv2raynode/topv2raynode.github.io",
+    "proxyfree/proxyfree.github.io",
+    "v2ray-clash-free/v2ray-clash-free.github.io",
+    "vpn-shop/vpn-shop.github.io",
+    "topfreev2ray/topfreev2ray.github.io",
+    "freevpnssr/freevpnssr.github.io",
+    "karingnode/karingnode.github.io",
+    "free-clash-v2ray/free-clash-v2ray.github.io",
+    "freevlessnode/freevlessnode.github.io",
+    "free-ssr-clash/free-ssr-clash.github.io",
+    "free-clashx/free-clashx.github.io",
+    "free-v2ray-clash/free-v2ray-clash.github.io",
+    "freessrclash/freessrclash.github.io",
+    "freeqv2ray/freeqv2ray.github.io",
+    "clash-v2ray-free/clash-v2ray-free.github.io",
+    "tuijianjiedian/tuijianjiedian.github.io",
+    "pcfreevpn/pcfreevpn.github.io",
+    "v2ray-free/v2ray-free.github.io",
+    "pornnewbee/free-vless-VPN",
+    "freevpnapp/freevpnapp.github.io",
+    "freeproxyvpn/freeproxyvpn.github.io",
+    "free-v2raynode/free-v2raynode.github.io",
+    "clash-free-node/clash-free-node.github.io"
+  ]
+}
+[2025-12-25 04:31:54] [SUCCESS] 收集完成
+  数据: {
+  "statistics": {
+    "total": 1529,
+    "byType": {
+      "其他": 1517,
+      "V2Ray": 11,
+      "订阅链接": 1
+    }
+  },
+  "duration": 352.875,
+  "outputFile": "./output/subscriptions.md",
+  "validatedLinksCount": 1321
+}
+================================================================================
+[2025-12-25 04:31:54] [INFO] 会话结束: 订阅链接收集 (耗时: 352.88s)
+================================================================================

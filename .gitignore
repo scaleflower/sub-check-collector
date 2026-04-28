@@ -1,0 +1,17 @@
+openipdb.ipdb
+config.yaml
+mihomo.yaml
+test
+
+output/*
+subs-check*
+mihomo-check*
+
+.idea
+.vscode
+.claude/
+.qoder/
+
+.DS_Store
+.omc/
+.env
