@@ -1,14 +1,14 @@
 #!/bin/sh
-# subs-check 一键安装脚本
+# sub-check-collector 一键安装脚本
 # 兼容 bash / sh / dash
-# 用法: curl -fsSL https://raw.githubusercontent.com/beck-8/subs-check/master/install.sh | bash
-#   或: wget -qO- https://raw.githubusercontent.com/beck-8/subs-check/master/install.sh | bash
-# 加速: bash <(curl -fsSL https://ghfast.top/https://raw.githubusercontent.com/beck-8/subs-check/master/install.sh) https://ghfast.top/
+# 用法: curl -fsSL https://raw.githubusercontent.com/scaleflower/sub-check-collector/main/v2/install.sh | bash
+#   或: wget -qO- https://raw.githubusercontent.com/scaleflower/sub-check-collector/main/v2/install.sh | bash
+# 加速: bash <(curl -fsSL https://ghfast.top/https://raw.githubusercontent.com/scaleflower/sub-check-collector/main/v2/install.sh) https://ghfast.top/
 
 set -e
 
 # ============ 配置 ============
-REPO="beck-8/subs-check"
+REPO="scaleflower/sub-check-collector"
 INSTALL_DIR="/opt/subs-check"
 BINARY_NAME="subs-check"
 SERVICE_NAME="subs-check"
@@ -25,7 +25,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 info()  { printf "${BLUE}[INFO]${NC} %s\n" "$1"; }
 ok()    { printf "${GREEN}[OK]${NC} %s\n" "$1"; }
@@ -115,7 +115,11 @@ detect_arch() {
 # ============ 获取最新版本 ============
 get_latest_version() {
     info "正在获取最新版本..."
-    LATEST_VERSION=$(fetch_url "$GITHUB_API" | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": *"//;s/".*//')
+    API_URL="$GITHUB_API"
+    if [ -n "$GITHUB_PROXY" ]; then
+        API_URL="${GITHUB_PROXY}${API_URL}"
+    fi
+    LATEST_VERSION=$(fetch_url "$API_URL" | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": *"//;s/".*//')
     if [ -z "$LATEST_VERSION" ]; then
         error "无法获取最新版本号，请检查网络连接"
     fi
@@ -165,12 +169,24 @@ install_binary() {
     fi
 }
 
+# ============ 初始化配置 ============
+init_config() {
+    CONFIG_DIR="${INSTALL_DIR}/config"
+    mkdir -p "$CONFIG_DIR"
+
+    # 首次安装时生成默认配置
+    if [ ! -f "${CONFIG_DIR}/config.yaml" ]; then
+        info "首次运行将自动生成默认配置文件"
+        info "请安装完成后编辑 ${CONFIG_DIR}/config.yaml"
+    fi
+}
+
 # ============ 配置 systemd ============
 setup_systemd() {
     info "正在配置 systemd 服务..."
     cat > "$SERVICE_FILE" <<EOF
 [Unit]
-Description=Subs Check - 订阅检测转换工具
+Description=Subs Check Collector - 订阅检测与收集工具
 After=network-online.target
 Wants=network-online.target
 StartLimitBurst=5
@@ -225,9 +241,9 @@ print_info() {
     printf "\n"
     printf "${GREEN}========================================${NC}\n"
     if [ "$IS_UPGRADE" -eq 1 ]; then
-        printf "${GREEN} subs-check 升级成功！${NC}\n"
+        printf "${GREEN} sub-check-collector 升级成功！${NC}\n"
     else
-        printf "${GREEN} subs-check 安装成功！${NC}\n"
+        printf "${GREEN} sub-check-collector 安装成功！${NC}\n"
     fi
     printf "${GREEN}========================================${NC}\n"
     printf "\n"
@@ -263,13 +279,16 @@ print_info() {
         printf "    rm -rf %s\n" "$INSTALL_DIR"
     fi
     printf "\n"
-    printf "${YELLOW}  如需修改参数，请编辑配置文件：${NC}\n"
-    printf "    %s/config/config.yaml\n" "$INSTALL_DIR"
+    printf "${YELLOW}  首次使用步骤：${NC}\n"
+    printf "    1. 编辑配置文件: %s/config/config.yaml\n" "$INSTALL_DIR"
+    printf "       填写订阅地址(sub-urls)、github-token 等\n"
+    printf "    2. 如需自动收集订阅，在配置文件中启用 collector-enabled: true\n"
+    printf "    3. 启动服务或重启程序使配置生效\n"
     if [ "$HAS_SYSTEMD" -eq 1 ]; then
-        printf "  修改后重启服务：systemctl restart %s\n" "$SERVICE_NAME"
-    else
-        printf "  修改后重新运行程序即可生效\n"
+        printf "       systemctl restart %s\n" "$SERVICE_NAME"
     fi
+    printf "\n"
+    printf "${BLUE}  Web 控制面板: http://<服务器IP>:8199/admin${NC}\n"
     printf "\n"
 }
 
@@ -277,7 +296,7 @@ print_info() {
 main() {
     printf "\n"
     printf "${GREEN}========================================${NC}\n"
-    printf "${GREEN} subs-check 一键安装脚本${NC}\n"
+    printf "${GREEN} sub-check-collector 一键安装脚本${NC}\n"
     printf "${GREEN}========================================${NC}\n"
     printf "\n"
 
@@ -289,11 +308,11 @@ main() {
     detect_arch
     get_latest_version
     install_binary
+    init_config
 
     if [ "$HAS_SYSTEMD" -eq 1 ]; then
         setup_systemd
         ask_enable
-        # 升级模式：询问是否重新启动；新安装：询问是否立即启动
         if [ "$IS_UPGRADE" -eq 1 ]; then
             printf "${YELLOW}是否重新启动服务？[Y/n]: ${NC}"
             read -r answer < /dev/tty

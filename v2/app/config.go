@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/beck-8/subs-check/collector"
 	"github.com/beck-8/subs-check/config"
 	"github.com/beck-8/subs-check/utils"
 	"github.com/fsnotify/fsnotify"
@@ -72,30 +71,12 @@ func (app *App) initConfigWatcher() error {
 
 	// 防抖定时器，防止vscode等软件先临时创建文件在覆盖，会产生两次write事件
 	var debounceTimer *time.Timer
-	var collectorDebounceTimer *time.Timer
 	go func() {
 		for {
 			select {
 			case event, ok := <-watcher.Events:
 				if !ok {
 					return
-				}
-
-				// 检查是否是 collector.env 文件变化
-				collectorEnvAbs, _ := filepath.Abs(collector.GetEnvPath())
-				if eventAbs, _ := filepath.Abs(event.Name); eventAbs == collectorEnvAbs {
-					if event.Op&(fsnotify.Write|fsnotify.Create) != 0 {
-						if collectorDebounceTimer != nil {
-							collectorDebounceTimer.Stop()
-						}
-						collectorDebounceTimer = time.AfterFunc(100*time.Millisecond, func() {
-							slog.Info("collector.env 发生变化，正在重新加载")
-							if err := collector.LoadEnv(); err != nil {
-								slog.Error(fmt.Sprintf("重新加载 collector.env 失败: %v", err))
-							}
-						})
-					}
-					continue
 				}
 
 				if absPath, _ := filepath.Abs(app.configPath); event.Name != absPath {
