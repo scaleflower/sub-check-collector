@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("./config");
 const scheduler_1 = require("./scheduler");
 const logger_1 = require("./logger");
+const web_server_1 = require("./web-server");
 /**
  * 主入口
  */
@@ -25,7 +26,13 @@ async function main() {
     // 解析命令行参数
     const args = process.argv.slice(2);
     const command = args[0];
-    if (command === 'once' || command === 'run') {
+    if (command === 'web') {
+        console.log('Web panel starting...');
+        const server = (0, web_server_1.createServer)(parseInt(process.env.WEB_PORT || '8198'));
+        console.log('Press Ctrl+C to exit\n');
+        process.on('SIGINT', () => { console.log('\nExiting'); server.close(); process.exit(0); });
+    }
+    else if (command === 'once' || command === 'run') {
         // 立即执行一次
         await scheduler.runOnce();
         process.exit(0);
@@ -51,7 +58,9 @@ async function main() {
         console.log('  npm start              - 启动定时任务');
         console.log('  npm start once         - 立即执行一次');
         console.log('  npm start schedule     - 启动定时任务');
-        console.log('  npm start -- --run-now - 启动定时任务并立即执行一次\n');
+        console.log('  npm run web           - 启动 Web 管理面板 (端口 8198)');
+        console.log('  npm start -- --run-now - 启动定时任务并立即执行一次');
+        console.log('  node dist/index.js web - 启动 Web 管理面板\n');
         process.exit(1);
     }
 }
