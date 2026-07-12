@@ -14,9 +14,13 @@ function readLogTail(n: number = 100): string {
   try {
     const dir = LOG_DIR;
     if (!fs.existsSync(dir)) return '';
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.log')).sort().reverse();
+    const files = fs.readdirSync(dir)
+      .filter(f => f.endsWith('.log'))
+      .map(f => ({ name: f, mtime: fs.statSync(path.join(dir, f)).mtimeMs }))
+      .sort((a, b) => b.mtime - a.mtime)
+      .map(f => path.join(dir, f.name));
     if (!files.length) return '';
-    const c = fs.readFileSync(path.join(dir, files[0]), 'utf-8');
+    const c = fs.readFileSync(files[0], 'utf-8');
     return c.split('\n').filter(Boolean).slice(-n).join('\n');
   } catch { return ''; }
 }
