@@ -1,0 +1,37 @@
+{
+  "name": "v2ray-subscription-collector",
+  "version": "1.0.0",
+  "description": "自动从 GitHub 搜索并收集 V2Ray/Clash 订阅链接",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "once": "npm run dev once",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "v2ray",
+    "clash",
+    "subscription",
+    "github",
+    "collector"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "js-yaml": "^4.1.0",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.10.0",
+    "@types/node-schedule": "^2.1.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
