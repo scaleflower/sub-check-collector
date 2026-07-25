@@ -29,10 +29,19 @@ export class GitHubSearcher {
     maxDaysSinceUpdate?: number
   ): Promise<Repository[]> {
     try {
-      // 构建搜索查询: 使用 AND 连接所有关键字
-      const query = keywords.join(' ');
+      // 先让 GitHub 过滤候选，避免取满一页后再由本地过滤掉
+      // 不合格仓库，导致最终数量低于 maxResults。
+      const qualifiers: string[] = [];
+      if (minStars > 0) {
+        qualifiers.push(`stars:>=${minStars}`);
+      }
+      if (maxDaysSinceUpdate) {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - maxDaysSinceUpdate);
+        qualifiers.push(`pushed:>=${cutoffDate.toISOString().slice(0, 10)}`);
+      }
 
-      console.log(`🔍 搜索关键字: ${query}`);
+      console.log(`🔍 搜索关键字: ${keywords.join(', ')}`);
       if (minStars > 0) {
         console.log(`   最低 star: ${minStars}`);
       }
@@ -40,21 +49,48 @@ export class GitHubSearcher {
         console.log(`   最大更新天数: ${maxDaysSinceUpdate} 天`);
       }
 
-      // 先按更新时间搜索,获取更多结果用于后续排序
-      const response = await this.octokit.rest.search.repos({
-        q: query,
-        sort: 'updated',
-        order: 'desc',
-        per_page: Math.min(maxResults * 3, 100), // 获取3倍数量用于过滤和排序
-      });
+      // 分别搜索每个关键字并去重合并。把所有关键字放在同一个查询中
+      // 会要求仓库同时匹配全部关键字，容易无法达到配置数量。
+      const repositoryMap = new Map<string, Repository>();
+      const perPage = 100;
 
-      let repositories: Repository[] = response.data.items.map((item) => ({
-        fullName: item.full_name,
-        url: item.html_url,
-        description: item.description || undefined,
-        stars: item.stargazers_count,
-        updatedAt: new Date(item.updated_at),
-      }));
+      for (const keyword of keywords) {
+        for (let page = 1; page <= 10 && repositoryMap.size < maxResults; page++) {
+          const query = [keyword, ...qualifiers].join(' ');
+          const response = await this.octokit.rest.search.repos({
+            q: query,
+            sort: 'updated',
+            order: 'desc',
+            per_page: perPage,
+            page,
+          });
+
+          for (const item of response.data.items) {
+            if (!repositoryMap.has(item.full_name)) {
+              repositoryMap.set(item.full_name, {
+                fullName: item.full_name,
+                url: item.html_url,
+                description: item.description || undefined,
+                stars: item.stargazers_count,
+                updatedAt: new Date(item.updated_at),
+              });
+            }
+          }
+
+          console.log(
+            `   ${keyword} 第 ${page} 页: ${response.data.items.length} 个，去重累计 ${repositoryMap.size} 个`
+          );
+
+          if (response.data.items.length < perPage) {
+            break;
+          }
+        }
+        if (repositoryMap.size >= maxResults) {
+          break;
+        }
+      }
+
+      let repositories = Array.from(repositoryMap.values());
 
       console.log(`✅ 初步找到 ${repositories.length} 个仓库`);
 
@@ -76,6 +112,12 @@ export class GitHubSearcher {
         if (filteredCount > 0) {
           console.log(`   📅 过滤超过 ${maxDaysSinceUpdate} 天未更新: ${beforeCount} → ${repositories.length} (过滤了 ${filteredCount} 个)`);
         }
+      }
+
+      if (repositories.length < maxResults) {
+        throw new Error(
+          `仅找到 ${repositories.length} 个符合条件的仓库，配置要求 ${maxResults} 个`
+        );
       }
 
       // 3. 综合排序: star 权重 70%, 更新时间权重 30%
