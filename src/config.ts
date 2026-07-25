@@ -49,6 +49,25 @@ export const DEFAULT_CONFIG: Config = {
   enableFileLog: true,
 };
 
+function parseBoolean(value: string | undefined, fallback: boolean): boolean {
+  if (value === undefined) return fallback;
+
+  switch (value.trim().toLowerCase()) {
+    case 'true':
+    case 'yes':
+    case '1':
+    case 'on':
+      return true;
+    case 'false':
+    case 'no':
+    case '0':
+    case 'off':
+      return false;
+    default:
+      return fallback;
+  }
+}
+
 /**
  * 从环境变量和配置文件加载配置
  */
@@ -62,10 +81,10 @@ export function loadConfig(): Config {
     configYamlPath: process.env.CONFIG_YAML_PATH || DEFAULT_CONFIG.configYamlPath,
     minStars: parseInt(process.env.MIN_STARS || String(DEFAULT_CONFIG.minStars)),
     maxDaysSinceUpdate: parseInt(process.env.MAX_DAYS_SINCE_UPDATE || String(DEFAULT_CONFIG.maxDaysSinceUpdate)),
-    validateLinks: process.env.VALIDATE_LINKS === 'true' || DEFAULT_CONFIG.validateLinks,
+    validateLinks: parseBoolean(process.env.VALIDATE_LINKS, DEFAULT_CONFIG.validateLinks ?? false),
     linkValidationTimeout: parseInt(process.env.LINK_VALIDATION_TIMEOUT || String(DEFAULT_CONFIG.linkValidationTimeout)),
     linkValidationConcurrency: parseInt(process.env.LINK_VALIDATION_CONCURRENCY || String(DEFAULT_CONFIG.linkValidationConcurrency)),
     logDir: process.env.LOG_DIR || DEFAULT_CONFIG.logDir,
-    enableFileLog: process.env.ENABLE_FILE_LOG !== 'false', // 默认启用,除非明确设置为 false
+    enableFileLog: parseBoolean(process.env.ENABLE_FILE_LOG, DEFAULT_CONFIG.enableFileLog ?? true),
   };
 }

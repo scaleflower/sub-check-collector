@@ -1,6 +1,21 @@
 import { Octokit } from '@octokit/rest';
 import { Repository } from './types';
 
+function buildSearchQueries(keywords: string[]): string[] {
+  const normalized = Array.from(
+    new Set(keywords.map(keyword => keyword.trim()).filter(Boolean))
+  );
+  const freeKeyword = normalized.find(keyword => keyword.toLowerCase() === 'free');
+
+  if (freeKeyword && normalized.length > 1) {
+    return normalized
+      .filter(keyword => keyword !== freeKeyword)
+      .map(keyword => `${freeKeyword} ${keyword}`);
+  }
+
+  return normalized;
+}
+
 /**
  * GitHub 搜索模块
  * 职责: 根据关键字搜索相关仓库
@@ -41,7 +56,8 @@ export class GitHubSearcher {
         qualifiers.push(`pushed:>=${cutoffDate.toISOString().slice(0, 10)}`);
       }
 
-      console.log(`🔍 搜索关键字: ${keywords.join(', ')}`);
+      const searchQueries = buildSearchQueries(keywords);
+      console.log(`🔍 搜索查询: ${searchQueries.join(', ')}`);
       if (minStars > 0) {
         console.log(`   最低 star: ${minStars}`);
       }
@@ -54,9 +70,9 @@ export class GitHubSearcher {
       const repositoryMap = new Map<string, Repository>();
       const perPage = 100;
 
-      for (const keyword of keywords) {
+      for (const searchQuery of searchQueries) {
         for (let page = 1; page <= 10 && repositoryMap.size < maxResults; page++) {
-          const query = [keyword, ...qualifiers].join(' ');
+          const query = [searchQuery, ...qualifiers].join(' ');
           const response = await this.octokit.rest.search.repos({
             q: query,
             sort: 'updated',
@@ -78,7 +94,7 @@ export class GitHubSearcher {
           }
 
           console.log(
-            `   ${keyword} 第 ${page} 页: ${response.data.items.length} 个，去重累计 ${repositoryMap.size} 个`
+            `   ${searchQuery} 第 ${page} 页: ${response.data.items.length} 个，去重累计 ${repositoryMap.size} 个`
           );
 
           if (response.data.items.length < perPage) {

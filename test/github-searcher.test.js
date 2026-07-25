@@ -49,6 +49,12 @@ test('returns 100 repositories when 100 repositories satisfy the configured filt
 
   assert.equal(repositories.length, 100);
   assert.match(requests[0].q, /pushed:>=/);
+  assert.match(requests[0].q, /^free v2ray /);
+  assert.equal(
+    requests.some((request) => /^free pushed:/.test(request.q)),
+    false,
+    'generic free keyword must not be searched by itself'
+  );
 });
 
 test('fails explicitly when GitHub has fewer repositories than configured', async () => {
@@ -84,10 +90,11 @@ test('combines distinct keyword searches until 100 repositories are collected', 
       search: {
         repos: async (request) => {
           requests.push(request);
-          const keyword = ['free', 'v2ray', 'clash'].find((value) =>
-            request.q.startsWith(`${value} `)
-          );
-          const prefix = keyword || 'combined';
+          const prefix = request.q.startsWith('free v2ray ')
+            ? 'v2ray'
+            : request.q.startsWith('free clash ')
+              ? 'clash'
+              : 'unexpected';
           return {
             data: {
               total_count: 50,
@@ -112,7 +119,7 @@ test('combines distinct keyword searches until 100 repositories are collected', 
   assert.equal(repositories.length, 100);
   assert.equal(new Set(repositories.map((repo) => repo.fullName)).size, 100);
   assert.deepEqual(
-    requests.map((request) => request.q.split(' ')[0]),
-    ['free', 'v2ray']
+    requests.map((request) => request.q.split(' pushed:')[0]),
+    ['free v2ray', 'free clash']
   );
 });
