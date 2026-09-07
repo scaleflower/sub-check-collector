@@ -24,6 +24,9 @@ export const DEFAULT_CONFIG: Config = {
   // 最大搜索仓库数
   maxRepositories: 30,
 
+  // sub-urls maximum count limit (replaces old links each run)
+  maxSubUrls: 50,
+
   // config.yaml 文件路径
   configYamlPath: './config.yaml',
 
@@ -78,6 +81,7 @@ export function loadConfig(): Config {
     scheduleInterval: process.env.SCHEDULE_INTERVAL || DEFAULT_CONFIG.scheduleInterval,
     outputFile: process.env.OUTPUT_FILE || DEFAULT_CONFIG.outputFile,
     maxRepositories: parseInt(process.env.MAX_REPOSITORIES || String(DEFAULT_CONFIG.maxRepositories)),
+    maxSubUrls: parseInt(process.env.SUB_URLS_MAX_COUNT || String(DEFAULT_CONFIG.maxSubUrls)),
     configYamlPath: process.env.CONFIG_YAML_PATH || DEFAULT_CONFIG.configYamlPath,
     minStars: parseInt(process.env.MIN_STARS || String(DEFAULT_CONFIG.minStars)),
     maxDaysSinceUpdate: parseInt(process.env.MAX_DAYS_SINCE_UPDATE || String(DEFAULT_CONFIG.maxDaysSinceUpdate)),

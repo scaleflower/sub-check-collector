@@ -1,5 +1,16 @@
 import axios, { AxiosError } from 'axios';
+import { Agent as HttpAgent } from 'http';
+import { createRequire } from 'module';
 import { SubscriptionLink } from './types';
+
+const proxyRequire = createRequire(__filename);
+type ProxyAgentConstructor = new (proxyUrl: string) => HttpAgent;
+const { HttpsProxyAgent } = proxyRequire('https-proxy-agent') as {
+  HttpsProxyAgent: ProxyAgentConstructor;
+};
+const { HttpProxyAgent } = proxyRequire('http-proxy-agent') as {
+  HttpProxyAgent: ProxyAgentConstructor;
+};
 
 /**
  * 验证结果接口
@@ -17,10 +28,21 @@ interface ValidationResult {
 export class LinkValidator {
   private timeout: number;
   private concurrency: number;
+  private readonly httpAgent?: HttpAgent;
+  private readonly httpsAgent?: HttpAgent;
 
   constructor(timeout: number = 10000, concurrency: number = 10) {
     this.timeout = timeout;
     this.concurrency = concurrency;
+
+    // Axios's built-in proxy handling is incompatible with the GOST CONNECT path.
+    // Delegate proxying to standard agents and disable Axios's own proxy logic.
+    const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy ||
+      process.env.HTTP_PROXY || process.env.http_proxy;
+    if (proxyUrl) {
+      this.httpAgent = new HttpProxyAgent(proxyUrl);
+      this.httpsAgent = new HttpsProxyAgent(proxyUrl);
+    }
   }
 
   /**
@@ -37,6 +59,9 @@ export class LinkValidator {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
         maxRedirects: 5,
+        httpAgent: this.httpAgent,
+        httpsAgent: this.httpsAgent,
+        proxy: false,
       });
 
       // 检查是否返回了内容

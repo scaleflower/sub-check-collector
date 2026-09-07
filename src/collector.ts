@@ -115,7 +115,7 @@ export class SubscriptionCollector {
         await this.configUpdater.backupConfig();
 
         // 更新 config.yaml (使用验证后的链接)
-        await this.configUpdater.updateSubUrls(linksToUpdate);
+        await this.configUpdater.updateSubUrls(linksToUpdate, this.config.maxSubUrls);
       }
 
       // 7. 输出统计

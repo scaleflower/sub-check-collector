@@ -3,6 +3,7 @@
 import { loadConfig } from './config';
 import { TaskScheduler } from './scheduler';
 import { Logger } from './logger';
+import { createServer } from './web-server';
 
 /**
  * 主入口
@@ -31,7 +32,19 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
 
-  if (command === 'once' || command === 'run') {
+  if (command === 'web') {
+    console.log('Web panel starting...');
+    const server = createServer(8198, undefined, scheduler);
+    console.log('Web collection scheduler and panel are running\n');
+    const shutdown = (signal: string) => {
+      console.log(`\nExiting on ${signal}`);
+      scheduler.stop();
+      server.close(() => process.exit(0));
+      setTimeout(() => process.exit(1), 5000).unref();
+    };
+    process.on('SIGINT', () => shutdown('SIGINT'));
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+  } else if (command === 'once' || command === 'run') {
     // 立即执行一次
     await scheduler.runOnce();
     process.exit(0);
@@ -58,7 +71,9 @@ async function main() {
     console.log('  npm start              - 启动定时任务');
     console.log('  npm start once         - 立即执行一次');
     console.log('  npm start schedule     - 启动定时任务');
-    console.log('  npm start -- --run-now - 启动定时任务并立即执行一次\n');
+console.log('  npm run web           - 启动 Web 管理面板 (端口 8198)');
+    console.log('  npm start -- --run-now - 启动定时任务并立即执行一次');
+console.log('  node dist/index.js web - 启动 Web 管理面板\n');
     process.exit(1);
   }
 }

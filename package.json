@@ -24,6 +24,8 @@
     "@octokit/rest": "^22.0.1",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
+    "http-proxy-agent": "^9.1.0",
+    "https-proxy-agent": "^9.1.0",
     "js-yaml": "^4.1.0",
     "node-schedule": "^2.1.1"
   },

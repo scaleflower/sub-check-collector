@@ -13,10 +13,17 @@ export class TaskScheduler {
   private config: Config;
   private job?: schedule.Job;
 
-  constructor(config: Config, logger: Logger) {
+  private hooks: SchedulerHooks;
+
+  constructor(config: Config, logger: Logger, hooks: SchedulerHooks = {}) {
     this.config = config;
     this.logger = logger;
+    this.hooks = hooks;
     this.collector = new SubscriptionCollector(config, logger);
+  }
+
+  setHooks(hooks: SchedulerHooks): void {
+    this.hooks = hooks;
   }
 
   /**
@@ -30,7 +37,7 @@ export class TaskScheduler {
     this.job = schedule.scheduleJob(this.config.scheduleInterval, async () => {
       console.log(`\n⏰ [${new Date().toLocaleString('zh-CN')}] 定时任务触发\n`);
       try {
-        await this.collector.collect();
+        await this.run();
       } catch (error) {
         console.error('❌ 定时任务执行失败:', error);
       }
@@ -42,7 +49,20 @@ export class TaskScheduler {
    */
   async runOnce(): Promise<void> {
     console.log('🔥 手动执行一次收集任务\n');
-    await this.collector.collect();
+    await this.run();
+  }
+
+  private async run(): Promise<void> {
+    this.hooks.onRunStart?.();
+    let runError: unknown;
+    try {
+      await this.collector.collect();
+    } catch (error) {
+      runError = error;
+      throw error;
+    } finally {
+      this.hooks.onRunEnd?.(runError);
+    }
   }
 
   /**
@@ -68,4 +88,9 @@ export class TaskScheduler {
       return '未知';
     }
   }
+}
+
+export interface SchedulerHooks {
+  onRunStart?: () => void;
+  onRunEnd?: (error?: unknown) => void;
 }

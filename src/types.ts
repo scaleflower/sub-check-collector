@@ -29,6 +29,7 @@ export interface Config {
   scheduleInterval: string; // cron 表达式
   outputFile: string;
   maxRepositories: number;
+  maxSubUrls: number;        // sub-urls maximum count limit
   configYamlPath?: string; // config.yaml 文件路径
   minStars?: number; // 最低 star 数量
   maxDaysSinceUpdate?: number; // 最大更新天数(超过此天数的仓库将被忽略)
