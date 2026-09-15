@@ -50,6 +50,10 @@ export const DEFAULT_CONFIG: Config = {
 
   // 是否启用文件日志 (默认启用)
   enableFileLog: true,
+
+  // 钉钉通知 (可选)
+  dingtalkWebhook: process.env.DINGTALK_WEBHOOK,
+  dingtalkSecret: process.env.DINGTALK_SECRET,
 };
 
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {
@@ -90,5 +94,7 @@ export function loadConfig(): Config {
     linkValidationConcurrency: parseInt(process.env.LINK_VALIDATION_CONCURRENCY || String(DEFAULT_CONFIG.linkValidationConcurrency)),
     logDir: process.env.LOG_DIR || DEFAULT_CONFIG.logDir,
     enableFileLog: parseBoolean(process.env.ENABLE_FILE_LOG, DEFAULT_CONFIG.enableFileLog ?? true),
+    dingtalkWebhook: process.env.DINGTALK_WEBHOOK,
+    dingtalkSecret: process.env.DINGTALK_SECRET,
   };
 }

@@ -5,6 +5,7 @@ import { ConfigUpdater } from './config-updater';
 import { LinkValidator } from './link-validator';
 import { Logger } from './logger';
 import { Config } from './types';
+import { buildCollectorMessage, sendDingTalkMarkdown } from './dingtalk';
 
 /**
  * 订阅链接收集器
@@ -137,6 +138,22 @@ export class SubscriptionCollector {
         outputFile: this.config.outputFile,
         validatedLinksCount: this.config.validateLinks ? linksToUpdate.length : undefined,
       });
+
+      if (this.config.dingtalkWebhook) {
+        const message = buildCollectorMessage({
+          repositoryCount: repositories.length,
+          candidateCount: stats.total,
+          validCount: this.config.validateLinks ? linksToUpdate.length : stats.total,
+          durationSeconds: elapsed,
+        });
+        await sendDingTalkMarkdown({
+          ...message,
+          webhook: this.config.dingtalkWebhook,
+          secret: this.config.dingtalkSecret,
+        }).catch(error => {
+          console.warn('⚠️  发送钉钉通知失败:', error instanceof Error ? error.message : error);
+        });
+      }
 
       await this.logger.sessionEnd('订阅链接收集', elapsed);
     } catch (error) {

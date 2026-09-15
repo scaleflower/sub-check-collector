@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { spawn } from 'child_process';
+import { buildSubsCheckMessage, sendDingTalkMarkdown } from './dingtalk';
 
 interface RunState { running: boolean; lastRun: string|null; lastResult: string|null; }
 let state: RunState = { running: false, lastRun: null, lastResult: null };
@@ -193,7 +194,7 @@ function triggerSubsCheck(): Promise<string> {
       path: '/api/trigger-check',
       method: 'POST',
       headers: {
-        'X-API-Key': 'Hp6230HYK',
+        'X-API-Key': apiKey,
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(postData)
       }
@@ -220,13 +221,45 @@ function unauthorized(res: http.ServerResponse): void {
 export function createServer(
   port: number = 8198,
   collectorRunner?: CollectorRunner,
-  scheduler?: SchedulerHandle
+  scheduler?: SchedulerHandle,
+  notifySubsCheck?: (successCount: number) => Promise<void>
 ) {
   const runner = collectorRunner || runCollector;
   const authUsername = process.env.WEB_AUTH_USERNAME || '';
   const authPassword = process.env.WEB_AUTH_PASSWORD || '';
 
+  const handleSubsCheckCallback = async (req: http.IncomingMessage, res: http.ServerResponse) => {
+    const callbackToken = process.env.SUBS_CHECK_CALLBACK_TOKEN || '';
+    const providedToken = String(req.headers['x-callback-token'] || '');
+    const tokenMatches = callbackToken.length > 0 &&
+      providedToken.length === callbackToken.length &&
+      crypto.timingSafeEqual(Buffer.from(providedToken), Buffer.from(callbackToken));
+    if (!tokenMatches) return serveJson(res, { error: 'unauthorized' }, 401);
+
+    const body = JSON.parse(await readBody(req)) as { successCount?: number };
+    const successCount = Number(body.successCount);
+    if (!Number.isInteger(successCount) || successCount < 0) {
+      return serveJson(res, { error: 'successCount must be a non-negative integer' }, 400);
+    }
+    await (notifySubsCheck || (async (count: number) => {
+      const webhook = process.env.DINGTALK_WEBHOOK;
+      if (!webhook) throw new Error('DINGTALK_WEBHOOK is not configured');
+      const message = buildSubsCheckMessage(count);
+      await sendDingTalkMarkdown({
+        ...message,
+        webhook,
+        secret: process.env.DINGTALK_SECRET,
+      });
+    }))(successCount);
+    return serveJson(res, { ok: true });
+  };
+
   const s = http.createServer(async (req, res) => {
+    const u = new URL(req.url || '/', 'http://localhost');
+    if (u.pathname === '/internal/notify/subs-check' && req.method === 'POST') {
+      return handleSubsCheckCallback(req, res);
+    }
+
     if (!authUsername || !authPassword) {
       res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(JSON.stringify({ error: 'web authentication is not configured' }));
@@ -251,7 +284,6 @@ export function createServer(
     }
     if (!authorized) return unauthorized(res);
 
-    const u = new URL(req.url || '/', 'http://localhost');
     try {
       const p = u.pathname;
       if (p === '/' || p === '/index.html') return serveHtml(res);

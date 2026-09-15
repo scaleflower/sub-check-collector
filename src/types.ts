@@ -38,4 +38,6 @@ export interface Config {
   linkValidationConcurrency?: number; // 链接验证并发数
   logDir?: string; // 日志目录
   enableFileLog?: boolean; // 是否启用文件日志
+  dingtalkWebhook?: string; // 钉钉机器人 Webhook
+  dingtalkSecret?: string; // 钉钉机器人加签密钥
 }
